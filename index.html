@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DUPR Night Scoring · PickleBee by 71</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e9efe9; --surface:#f4f8f3; --surface-2:#eef3ed;
+  --lime:#a8d600; --lime-deep:#8bb800; --pink:#ff2e9a; --cyan:#12cccc;
+  --ink:#1c2a1f; --muted:#6b7d6e;
+  --clay:7px 7px 18px rgba(60,80,55,.18), -7px -7px 16px rgba(255,255,255,.9);
+  --clay-in:inset 4px 4px 9px rgba(60,80,55,.16), inset -4px -4px 9px rgba(255,255,255,.85);
+  --clay-sm:4px 4px 11px rgba(60,80,55,.16), -4px -4px 10px rgba(255,255,255,.85);
+  --r:24px; --r-sm:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;color:var(--ink);padding:20px 14px 70px;min-height:100vh;
+  background:radial-gradient(circle at 12% 6%,rgba(168,214,0,.10),transparent 40%),
+    radial-gradient(circle at 90% 96%,rgba(18,204,204,.10),transparent 42%),var(--bg);
+  -webkit-font-smoothing:antialiased;}
+.wrap{max-width:680px;margin:0 auto;}
+header{text-align:center;margin-bottom:22px;}
+.logo{width:80px;height:80px;object-fit:contain;background:var(--surface);border-radius:50%;
+  box-shadow:var(--clay);padding:11px;margin:0 auto 12px;display:block;}
+.eyebrow{font-family:'Fredoka';font-weight:600;letter-spacing:.5px;color:var(--cyan);
+  text-transform:uppercase;font-size:.78rem;}
+h1{font-family:'Fredoka';font-weight:700;font-size:clamp(1.4rem,5vw,2rem);line-height:1.1;}
+h1 .hl{color:var(--pink);}
+
+.screen{display:none;} .screen.active{display:block;animation:rise .35s ease both;}
+@keyframes rise{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+.panel{background:var(--surface);border-radius:var(--r);box-shadow:var(--clay);padding:24px 20px;margin-bottom:18px;}
+label.fld{display:block;font-weight:800;font-size:.9rem;margin-bottom:8px;}
+select,input.otp{width:100%;font-family:'Nunito';font-weight:700;font-size:1.05rem;color:var(--ink);
+  padding:14px 16px;border:none;border-radius:var(--r-sm);background:var(--surface-2);
+  box-shadow:var(--clay-in);outline:none;margin-bottom:18px;}
+input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fredoka';}
+.btn{width:100%;font-family:'Fredoka';font-weight:600;font-size:1.15rem;color:#fff;padding:16px;
+  border:none;border-radius:var(--r);cursor:pointer;box-shadow:var(--clay);
+  background:linear-gradient(135deg,var(--lime),var(--lime-deep));transition:transform .15s;}
+.btn:hover{transform:translateY(-2px);} .btn:active{transform:translateY(0);}
+.btn.sec{background:var(--surface-2);color:var(--ink);box-shadow:var(--clay-sm);font-size:1rem;}
+.btn.cyan{background:linear-gradient(135deg,var(--cyan),var(--lime-deep));}
+.err{color:var(--pink);font-weight:800;font-size:.9rem;margin-bottom:12px;text-align:center;display:none;}
+.err.show{display:block;}
+
+.courtgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.courtbtn{font-family:'Fredoka';font-weight:600;font-size:1.4rem;color:var(--ink);padding:34px 10px;
+  border:none;border-radius:var(--r);cursor:pointer;background:var(--surface);box-shadow:var(--clay);
+  transition:transform .15s;}
+.courtbtn:hover{transform:translateY(-3px);}
+.courtbtn .sub{display:block;font-family:'Nunito';font-weight:700;font-size:.8rem;color:var(--muted);margin-top:6px;}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.ctx{font-family:'Fredoka';font-weight:600;font-size:1.15rem;}
+.ctx .court{color:var(--cyan);}
+.topbar .acts{display:flex;gap:8px;}
+.mini{font-family:'Nunito';font-weight:800;font-size:.82rem;border:none;cursor:pointer;
+  border-radius:11px;padding:9px 13px;background:var(--surface-2);box-shadow:var(--clay-sm);color:var(--ink);}
+
+.sec-h{font-family:'Fredoka';font-weight:600;font-size:1.1rem;margin:22px 4px 10px;display:flex;
+  align-items:center;gap:8px;}
+.match{background:var(--surface);border-radius:var(--r-sm);box-shadow:var(--clay-sm);padding:15px 16px;margin-bottom:13px;}
+.match .mh{display:flex;justify-content:space-between;font-size:.78rem;font-weight:800;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.match .teams{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:1.02rem;}
+.teamrow{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.teamrow .nm{flex:1;}
+.scorein{width:64px;text-align:center;font-family:'Fredoka';font-size:1.3rem;font-weight:600;
+  border:2px solid transparent;border-radius:11px;background:var(--surface-2);box-shadow:var(--clay-in);
+  padding:8px 4px;outline:none;}
+.savebtn{margin-top:12px;width:100%;font-family:'Fredoka';font-weight:600;font-size:1rem;color:#fff;
+  border:none;border-radius:12px;padding:12px;cursor:pointer;
+  background:linear-gradient(135deg,var(--lime),var(--lime-deep));box-shadow:var(--clay-sm);}
+.savebtn:hover{transform:translateY(-1px);}
+.badge{font-size:.72rem;font-weight:800;padding:4px 10px;border-radius:10px;}
+.badge.locked{background:var(--surface-2);color:var(--muted);box-shadow:var(--clay-sm);}
+.badge.win{background:var(--lime-deep);color:#fff;}
+.badge.wait{background:#ffe1ef;color:var(--pink);}
+.finalscore{font-family:'Fredoka';font-weight:600;font-size:1.2rem;}
+.winner{color:var(--lime-deep);}
+.waiting{color:var(--muted);font-weight:700;font-style:italic;font-size:.95rem;}
+
+.stand{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:6px;}
+.stand th{background:var(--surface-2);text-align:left;padding:7px 9px;font-size:.7rem;text-transform:uppercase;color:var(--muted);}
+.stand td{padding:7px 9px;border-bottom:1px solid #e1e8df;font-weight:700;}
+.stand td.c{text-align:center;}
+.stand .tie{color:var(--pink);font-weight:800;}
+.gcard{background:var(--surface);border-radius:var(--r-sm);box-shadow:var(--clay-sm);padding:13px 14px;margin-bottom:12px;}
+.gcard h4{font-family:'Fredoka';font-weight:600;margin-bottom:8px;}
+
+.collapse{cursor:pointer;user-select:none;}
+.over{display:none;} .over.show{display:block;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+  font-weight:700;padding:12px 22px;border-radius:14px;box-shadow:var(--clay);opacity:0;
+  pointer-events:none;transition:opacity .3s;z-index:60;text-align:center;max-width:90vw;}
+.toast.show{opacity:1;}
+.loading{text-align:center;color:var(--muted);font-weight:700;padding:30px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="./picklebee-logo.png" class="logo" alt="PickleBee by 71" onerror="this.style.display='none'">
+    <div class="eyebrow">Referee Scoring</div>
+    <h1 id="title">DUPR <span class="hl">Scoring</span></h1>
+  </header>
+
+  <!-- SCREEN 1: login -->
+  <section id="scrLogin" class="screen active">
+    <div class="panel">
+      <p class="err" id="loginErr"></p>
+      <label class="fld">Category</label>
+      <select id="catSel"></select>
+      <label class="fld">Access code (OTP)</label>
+      <input class="otp" id="otpIn" inputmode="numeric" maxlength="4" placeholder="0000">
+      <button class="btn" onclick="authenticate()">Continue</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2: court -->
+  <section id="scrCourt" class="screen">
+    <div class="panel">
+      <div class="ctx" id="courtCtx" style="text-align:center;margin-bottom:18px;"></div>
+      <div class="courtgrid">
+        <button class="courtbtn" onclick="pickCourt('Court N')">Court N<span class="sub">tap to score</span></button>
+        <button class="courtbtn" onclick="pickCourt('Court B')">Court B<span class="sub">tap to score</span></button>
+      </div>
+      <button class="btn sec" style="margin-top:16px;" onclick="logout()">Back</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: scoring -->
+  <section id="scrScore" class="screen">
+    <div class="topbar">
+      <div class="ctx" id="scoreCtx"></div>
+      <div class="acts">
+        <button class="mini" onclick="refresh(true)">Refresh</button>
+        <button class="mini" onclick="backToCourt()">Court</button>
+        <button class="mini" onclick="logout()">Exit</button>
+      </div>
+    </div>
+    <div id="scoreBody"><div class="loading">Loading matches…</div></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   PASTE THE SAME APPS SCRIPT /exec URL USED FOR THE OTHER SITES
+   ============================================================ */
+const BACKEND_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+
+const CATS = [
+  {key:'newbee_doubles',  label:'NEW BEE · Doubles'},
+  {key:'mixed_doubles',   label:'MIXED BEE · Doubles'},
+  {key:'stinger_doubles', label:'STINGER BEE · Doubles'},
+  {key:'newbee_singles',  label:'NEW BEE · Singles'},
+  {key:'stinger_singles', label:'STINGER BEE · Singles'},
+];
+
+let S = { category:null, label:null, otp:null, court:null, bracket:null };
+let saving = false;
+let pollTimer = null;
+
+/* ---- init: restore session if present ---- */
+(function init(){
+  const sel=document.getElementById('catSel');
+  CATS.forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent=c.label; sel.appendChild(o); });
+  const cat=sessionStorage.getItem('pb_cat'), otp=sessionStorage.getItem('pb_otp'), court=sessionStorage.getItem('pb_court');
+  if(cat && otp){
+    S.category=cat; S.otp=otp; S.label=(CATS.find(c=>c.key===cat)||{}).label;
+    sel.value=cat; document.getElementById('otpIn').value=otp;
+    authenticate(court||null);
+  }
+})();
+
+/* ---- screens ---- */
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* ---- auth ---- */
+async function authenticate(restoreCourt){
+  const cat=document.getElementById('catSel').value;
+  const otp=document.getElementById('otpIn').value.trim();
+  const err=document.getElementById('loginErr'); err.classList.remove('show');
+  if(!/^\d{4}$/.test(otp)){ err.textContent='Enter the 4-digit access code.'; err.classList.add('show'); return; }
+  try{
+    const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({action:'scoreAuth',category:cat,otp:otp})});
+    const out=await res.json();
+    if(!out.ok){ err.textContent=out.error||'Could not access this category.'; err.classList.add('show'); return; }
+    S.category=cat; S.otp=otp; S.label=out.label; S.bracket=out;
+    sessionStorage.setItem('pb_cat',cat); sessionStorage.setItem('pb_otp',otp);
+    document.getElementById('courtCtx').innerHTML=`${out.label}<br><span style="font-weight:700;color:var(--muted);font-size:.85rem">Week ${out.week} · choose your court</span>`;
+    if(restoreCourt){ S.court=restoreCourt; enterScoring(); }
+    else show('scrCourt');
+  }catch(e){ err.textContent='Network error. Check your connection.'; err.classList.add('show'); }
+}
+
+function pickCourt(c){ S.court=c; sessionStorage.setItem('pb_court',c); enterScoring(); }
+function backToCourt(){ stopPoll(); show('scrCourt'); }
+function logout(){ stopPoll(); sessionStorage.clear(); S={category:null,label:null,otp:null,court:null,bracket:null};
+  document.getElementById('otpIn').value=''; show('scrLogin'); }
+
+function enterScoring(){ show('scrScore'); renderScore(); startPoll(); }
+
+/* ---- refresh / poll ---- */
+async function refresh(manual){
+  if(saving) return;
+  if(!manual && document.activeElement && document.activeElement.classList.contains('scorein')) return; // don't clobber typing
+  try{
+    const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({action:'getBracket',category:S.category,otp:S.otp})});
+    const out=await res.json();
+    if(out.ok){ S.bracket=out; renderScore(); if(manual) toast('Updated'); }
+    else if(manual) toast(out.error||'Could not refresh');
+  }catch(e){ if(manual) toast('Network error'); }
+}
+function startPoll(){ stopPoll(); pollTimer=setInterval(()=>refresh(false),15000); }
+function stopPoll(){ if(pollTimer){ clearInterval(pollTimer); pollTimer=null; } }
+
+/* ---- labels ---- */
+function stageLabel(m){
+  if(m.stage==='group'){ const x=m.id.match(/^G(\d+)M(\d+)$/); return x?('Group '+x[1]+' · Match '+x[2]):m.id; }
+  if(m.id==='F') return 'Final';
+  if(m.id==='3P') return '3rd Place';
+  if(m.stage==='qf') return 'Quarterfinal '+m.id.slice(2);
+  if(m.stage==='sf') return 'Semifinal '+m.id.slice(2);
+  return m.id;
+}
+
+/* ---- render scoring screen ---- */
+function renderScore(){
+  const b=S.bracket; if(!b){ return; }
+  document.getElementById('scoreCtx').innerHTML=`${b.label}<br><span style="font-weight:700;font-size:.85rem">Week ${b.week} · <span class="court">${S.court}</span></span>`;
+  const body=document.getElementById('scoreBody'); body.innerHTML='';
+
+  // YOUR COURT matches
+  const mine=b.matches.filter(m=>m.court===S.court);
+  const h1=document.createElement('div'); h1.className='sec-h'; h1.textContent='Your matches — '+S.court; body.appendChild(h1);
+  if(mine.length===0) body.appendChild(el('<div class="match"><div class="waiting">No matches on this court.</div></div>'));
+  mine.forEach(m=> body.appendChild(matchCard(m,true)) );
+
+  // GROUP STANDINGS
+  const h2=document.createElement('div'); h2.className='sec-h'; h2.textContent='Group standings'; body.appendChild(h2);
+  b.groups.forEach(g=>{
+    const rows=g.rows.map(r=>`<tr><td class="c">${r.rank}</td><td>${r.name}${r.tie?' <span class="tie">tie</span>':''}</td><td class="c">${r.wins}</td><td class="c">${r.net>0?'+':''}${r.net}</td></tr>`).join('');
+    body.appendChild(el(`<div class="gcard"><h4>${g.label} ${g.complete?'':'<span style="color:var(--muted);font-weight:700;font-size:.8rem">(in progress)</span>'}</h4>
+      <table class="stand"><tr><th>#</th><th>Team</th><th>W</th><th>Net</th></tr>${rows}</table></div>`));
+  });
+
+  // FULL DRAW overview (read-only, collapsible)
+  const h3=document.createElement('div'); h3.className='sec-h collapse'; h3.innerHTML='Full draw overview +';
+  h3.onclick=()=>{ const o=document.getElementById('overBox'); o.classList.toggle('show'); h3.innerHTML='Full draw overview '+(o.classList.contains('show')?'−':'+'); };
+  body.appendChild(h3);
+  const over=document.createElement('div'); over.className='over'; over.id='overBox';
+  b.matches.forEach(m=> over.appendChild(matchCard(m,false)) );
+  body.appendChild(over);
+}
+
+function matchCard(m, editableContext){
+  const card=document.createElement('div'); card.className='match';
+  let head=`<div class="mh"><span>${stageLabel(m)}</span><span>${m.court} · ${m.time}</span></div>`;
+  let inner='';
+  const ready = m.aReady && m.bReady;
+
+  if(!ready){
+    inner=`<div class="teams"><div class="teamrow"><span class="nm">${m.aName}</span></div>
+      <div class="teamrow"><span class="nm">${m.bName}</span></div></div>
+      <div style="margin-top:8px"><span class="badge wait">waiting</span> <span class="waiting">teams not decided yet</span></div>`;
+  } else {
+    const canEdit = editableContext && m.court===S.court && m.editable;
+    if(canEdit){
+      inner=`<div class="teams">
+        <div class="teamrow"><span class="nm">${m.aName}</span><input class="scorein" id="sa_${m.id}" inputmode="numeric" value="${m.scoreA==null?'':m.scoreA}"></div>
+        <div class="teamrow"><span class="nm">${m.bName}</span><input class="scorein" id="sb_${m.id}" inputmode="numeric" value="${m.scoreB==null?'':m.scoreB}"></div>
+        </div>
+        <button class="savebtn" onclick="saveScore('${m.id}')">${m.done?'Update score':'Save score'}</button>`;
+    } else {
+      const score = m.done? `<span class="finalscore">${m.scoreA} – ${m.scoreB}</span>` : '<span class="waiting">not played yet</span>';
+      const badge = m.done? `<span class="badge win">${m.winner} won</span>` : (m.editable? '' : '<span class="badge locked">locked</span>');
+      inner=`<div class="teams">
+        <div class="teamrow"><span class="nm ${m.done&&m.winner===m.aName?'winner':''}">${m.aName}</span></div>
+        <div class="teamrow"><span class="nm ${m.done&&m.winner===m.bName?'winner':''}">${m.bName}</span></div></div>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">${score} ${badge}</div>`;
+    }
+  }
+  card.innerHTML=head+inner; return card;
+}
+
+/* ---- save ---- */
+async function saveScore(matchId){
+  const sa=document.getElementById('sa_'+matchId).value.trim();
+  const sb=document.getElementById('sb_'+matchId).value.trim();
+  if(sa===''||sb===''){ toast('Enter both scores.'); return; }
+  saving=true;
+  try{
+    const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({action:'saveScore',
+      category:S.category,otp:S.otp,court:S.court,matchId:matchId,scoreA:sa,scoreB:sb})});
+    const out=await res.json();
+    if(out.ok){ S.bracket=out; toast('Saved'); renderScore(); }
+    else toast(out.error||'Could not save');
+  }catch(e){ toast('Network error'); }
+  finally{ saving=false; }
+}
+
+/* ---- helpers ---- */
+function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
+let toastT;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2000); }
+</script>
+</body>
+</html>
