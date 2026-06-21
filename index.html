@@ -200,7 +200,7 @@ async function authenticate(restoreCourt){
     document.getElementById('courtCtx').innerHTML=`${out.label}<br><span style="font-weight:700;color:var(--muted);font-size:.85rem">Week ${out.week} · choose your court</span>`;
     if(restoreCourt){ S.court=restoreCourt; enterScoring(); }
     else show('scrCourt');
-  }catch(e){ err.textContent='Network error. Check your connection.'; err.classList.add('show'); }
+  }catch(e){ err.textContent="You don't have access, please contact the admin of PB71!"; err.classList.add('show'); }
 }
 
 function pickCourt(c){ S.court=c; sessionStorage.setItem('pb_court',c); enterScoring(); }
