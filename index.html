@@ -9,65 +9,69 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#e9efe9; --surface:#f4f8f3; --surface-2:#eef3ed;
-  --lime:#a8d600; --lime-deep:#8bb800; --pink:#ff2e9a; --cyan:#12cccc;
-  --ink:#1c2a1f; --muted:#6b7d6e;
-  --clay:7px 7px 18px rgba(60,80,55,.18), -7px -7px 16px rgba(255,255,255,.9);
-  --clay-in:inset 4px 4px 9px rgba(60,80,55,.16), inset -4px -4px 9px rgba(255,255,255,.85);
-  --clay-sm:4px 4px 11px rgba(60,80,55,.16), -4px -4px 10px rgba(255,255,255,.85);
-  --r:24px; --r-sm:14px;
+  --bg:#e9efe9;--surface:#f4f8f3;--surface-2:#eef3ed;
+  --lime:#a8d600;--lime-deep:#8bb800;--pink:#ff2e9a;--cyan:#12cccc;--orange:#ff8f00;
+  --ink:#1c2a1f;--muted:#6b7d6e;
+  --clay:7px 7px 18px rgba(60,80,55,.18),-7px -7px 16px rgba(255,255,255,.9);
+  --clay-in:inset 4px 4px 9px rgba(60,80,55,.16),inset -4px -4px 9px rgba(255,255,255,.85);
+  --clay-sm:4px 4px 11px rgba(60,80,55,.16),-4px -4px 10px rgba(255,255,255,.85);
+  --r:24px;--r-sm:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Nunito',sans-serif;color:var(--ink);padding:20px 14px 70px;min-height:100vh;
   background:radial-gradient(circle at 12% 6%,rgba(168,214,0,.10),transparent 40%),
-    radial-gradient(circle at 90% 96%,rgba(18,204,204,.10),transparent 42%),var(--bg);
+  radial-gradient(circle at 90% 96%,rgba(18,204,204,.10),transparent 42%),var(--bg);
   -webkit-font-smoothing:antialiased;}
 .wrap{max-width:680px;margin:0 auto;}
 header{text-align:center;margin-bottom:22px;}
 .logo{width:80px;height:80px;object-fit:contain;background:var(--surface);border-radius:50%;
   box-shadow:var(--clay);padding:11px;margin:0 auto 12px;display:block;}
-.eyebrow{font-family:'Fredoka';font-weight:600;letter-spacing:.5px;color:var(--cyan);
+.eyebrow{font-family:'Fredoka',sans-serif;font-weight:600;letter-spacing:.5px;color:var(--cyan);
   text-transform:uppercase;font-size:.78rem;}
-h1{font-family:'Fredoka';font-weight:700;font-size:clamp(1.4rem,5vw,2rem);line-height:1.1;}
+h1{font-family:'Fredoka',sans-serif;font-weight:700;font-size:clamp(1.4rem,5vw,2rem);line-height:1.1;}
 h1 .hl{color:var(--pink);}
-
-.screen{display:none;} .screen.active{display:block;animation:rise .35s ease both;}
+.screen{display:none;}.screen.active{display:block;animation:rise .35s ease both;}
 @keyframes rise{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
-
 .panel{background:var(--surface);border-radius:var(--r);box-shadow:var(--clay);padding:24px 20px;margin-bottom:18px;}
 label.fld{display:block;font-weight:800;font-size:.9rem;margin-bottom:8px;}
 select,input.otp{width:100%;font-family:'Nunito';font-weight:700;font-size:1.05rem;color:var(--ink);
   padding:14px 16px;border:none;border-radius:var(--r-sm);background:var(--surface-2);
   box-shadow:var(--clay-in);outline:none;margin-bottom:18px;}
 input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fredoka';}
-.btn{width:100%;font-family:'Fredoka';font-weight:600;font-size:1.15rem;color:#fff;padding:16px;
-  border:none;border-radius:var(--r);cursor:pointer;box-shadow:var(--clay);
+.btn{width:100%;font-family:'Fredoka',sans-serif;font-weight:600;font-size:1.15rem;color:#fff;
+  padding:16px;border:none;border-radius:var(--r);cursor:pointer;box-shadow:var(--clay);
   background:linear-gradient(135deg,var(--lime),var(--lime-deep));transition:transform .15s;}
-.btn:hover{transform:translateY(-2px);} .btn:active{transform:translateY(0);}
+.btn:hover{transform:translateY(-2px);}
 .btn.sec{background:var(--surface-2);color:var(--ink);box-shadow:var(--clay-sm);font-size:1rem;}
 .btn.cyan{background:linear-gradient(135deg,var(--cyan),var(--lime-deep));}
 .err{color:var(--pink);font-weight:800;font-size:.9rem;margin-bottom:12px;text-align:center;display:none;}
 .err.show{display:block;}
-
 .courtgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.courtbtn{font-family:'Fredoka';font-weight:600;font-size:1.4rem;color:var(--ink);padding:34px 10px;
-  border:none;border-radius:var(--r);cursor:pointer;background:var(--surface);box-shadow:var(--clay);
-  transition:transform .15s;}
+.courtbtn{font-family:'Fredoka',sans-serif;font-weight:600;font-size:1.4rem;color:var(--ink);
+  padding:34px 10px;border:none;border-radius:var(--r);cursor:pointer;background:var(--surface);
+  box-shadow:var(--clay);transition:transform .15s;}
 .courtbtn:hover{transform:translateY(-3px);}
 .courtbtn .sub{display:block;font-family:'Nunito';font-weight:700;font-size:.8rem;color:var(--muted);margin-top:6px;}
-
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
-.ctx{font-family:'Fredoka';font-weight:600;font-size:1.15rem;}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.ctx{font-family:'Fredoka',sans-serif;font-weight:600;font-size:1.15rem;}
 .ctx .court{color:var(--cyan);}
-.topbar .acts{display:flex;gap:8px;}
+.topbar .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .mini{font-family:'Nunito';font-weight:800;font-size:.82rem;border:none;cursor:pointer;
   border-radius:11px;padding:9px 13px;background:var(--surface-2);box-shadow:var(--clay-sm);color:var(--ink);}
-
-.sec-h{font-family:'Fredoka';font-weight:600;font-size:1.1rem;margin:22px 4px 10px;display:flex;
-  align-items:center;gap:8px;}
+.pending-pill{background:#fff3cd;color:#856404;font-weight:800;font-size:.76rem;
+  padding:6px 10px;border-radius:10px;box-shadow:var(--clay-sm);white-space:nowrap;cursor:pointer;}
+.pending-pill.retry{background:#d1f0e8;color:#0a6640;}
+.sec-h{font-family:'Fredoka',sans-serif;font-weight:600;font-size:1.1rem;margin:22px 4px 10px;
+  display:flex;align-items:center;gap:8px;}
 .match{background:var(--surface);border-radius:var(--r-sm);box-shadow:var(--clay-sm);padding:15px 16px;margin-bottom:13px;}
 .match .mh{display:flex;justify-content:space-between;font-size:.78rem;font-weight:800;color:var(--muted);
   text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.match.final-card{border:2px solid var(--lime);background:linear-gradient(135deg,#f8fff0,var(--surface));}
+.match.final-card .mh{color:var(--lime-deep);}
+.match.final1-card{border:2px solid var(--cyan);}
+.match.final1-card .mh{color:var(--cyan);}
+.match.final2-card{border:2px solid var(--pink);}
+.match.final2-card .mh{color:var(--pink);}
 .match .teams{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:1.02rem;}
 .teamrow{display:flex;justify-content:space-between;align-items:center;gap:10px;}
 .teamrow .nm{flex:1;}
@@ -83,19 +87,19 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
 .badge.win{background:var(--lime-deep);color:#fff;}
 .badge.wait{background:#ffe1ef;color:var(--pink);}
 .finalscore{font-family:'Fredoka';font-weight:600;font-size:1.2rem;}
-.winner{color:var(--lime-deep);}
+.winner{color:var(--lime-deep);font-weight:800;}
 .waiting{color:var(--muted);font-weight:700;font-style:italic;font-size:.95rem;}
-
 .stand{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:6px;}
 .stand th{background:var(--surface-2);text-align:left;padding:7px 9px;font-size:.7rem;text-transform:uppercase;color:var(--muted);}
 .stand td{padding:7px 9px;border-bottom:1px solid #e1e8df;font-weight:700;}
 .stand td.c{text-align:center;}
-.stand .tie{color:var(--pink);font-weight:800;}
+.stand .tie-flag{color:var(--pink);font-size:.72rem;font-weight:800;margin-left:4px;}
 .gcard{background:var(--surface);border-radius:var(--r-sm);box-shadow:var(--clay-sm);padding:13px 14px;margin-bottom:12px;}
-.gcard h4{font-family:'Fredoka';font-weight:600;margin-bottom:8px;}
-
+.gcard h4{font-family:'Fredoka',sans-serif;font-weight:600;margin-bottom:8px;}
 .collapse{cursor:pointer;user-select:none;}
-.over{display:none;} .over.show{display:block;}
+.over{display:none;}.over.show{display:block;}
+.finals-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:500px){.finals-grid{grid-template-columns:1fr;}}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
   font-weight:700;padding:12px 22px;border-radius:14px;box-shadow:var(--clay);opacity:0;
   pointer-events:none;transition:opacity .3s;z-index:60;text-align:center;max-width:90vw;}
@@ -107,8 +111,8 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
 <div class="wrap">
   <header>
     <img src="./picklebee-logo.png" class="logo" alt="PickleBee by 71" onerror="this.style.display='none'">
-    <div class="eyebrow">Referee SCORECOUNT</div>
-    <h1 id="title">DUPR <span class="hl">Night</span></h1>
+    <div class="eyebrow">Referee Scoring — Season 2</div>
+    <h1 id="title">DUPR <span class="hl">Scoring</span></h1>
   </header>
 
   <!-- SCREEN 1: login -->
@@ -123,7 +127,7 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
     </div>
   </section>
 
-  <!-- SCREEN 2: court -->
+  <!-- SCREEN 2: court selection -->
   <section id="scrCourt" class="screen">
     <div class="panel">
       <div class="ctx" id="courtCtx" style="text-align:center;margin-bottom:18px;"></div>
@@ -140,6 +144,7 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
     <div class="topbar">
       <div class="ctx" id="scoreCtx"></div>
       <div class="acts">
+        <span class="pending-pill" id="pendingPill" style="display:none" onclick="retryPendingScore()">Score pending — tap to retry</span>
         <button class="mini" onclick="refresh(true)">Refresh</button>
         <button class="mini" onclick="backToCourt()">Court</button>
         <button class="mini" onclick="logout()">Exit</button>
@@ -153,13 +158,15 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
 
 <script>
 /* ============================================================
-   PASTE THE SAME APPS SCRIPT /exec URL USED FOR THE OTHER SITES
+   PASTE YOUR APPS SCRIPT /exec URL HERE
    ============================================================ */
-const BACKEND_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzeZaUXvfqsA1oVqwwnSxdn_JJrYnCJQ5-3vA0-TCJSjMZUP2tRMEl-PawqlxZ5opGbXg/exec";
 
+// All 6 categories — Season 2
 const CATS = [
-  {key:'newbee_doubles',  label:'NEW BEE · Doubles'},
+  {key:'action_doubles',  label:'ACTION BEE · Doubles'},
   {key:'mixed_doubles',   label:'MIXED BEE · Doubles'},
+  {key:'newbee_doubles',  label:'NEW BEE · Doubles'},
   {key:'stinger_doubles', label:'STINGER BEE · Doubles'},
   {key:'newbee_singles',  label:'NEW BEE · Singles'},
   {key:'stinger_singles', label:'STINGER BEE · Singles'},
@@ -169,151 +176,254 @@ let S = { category:null, label:null, otp:null, court:null, bracket:null };
 let saving = false;
 let pollTimer = null;
 
-/* ---- init: restore session if present ---- */
+// PERF: track last score-field interaction to block auto-refresh mid-typing
+let lastInteractionTime = 0;
+function trackInteraction(){ lastInteractionTime = Date.now(); }
+
+/* ---- init: populate category dropdown + restore session ---- */
 (function init(){
-  const sel=document.getElementById('catSel');
-  CATS.forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent=c.label; sel.appendChild(o); });
-  const cat=sessionStorage.getItem('pb_cat'), otp=sessionStorage.getItem('pb_otp'), court=sessionStorage.getItem('pb_court');
-  if(cat && otp){
-    S.category=cat; S.otp=otp; S.label=(CATS.find(c=>c.key===cat)||{}).label;
-    sel.value=cat; document.getElementById('otpIn').value=otp;
-    authenticate(court||null);
-  }
+  const sel = document.getElementById('catSel');
+  CATS.forEach(c=>{
+    const o = document.createElement('option');
+    o.value = c.key; o.textContent = c.label;
+    sel.appendChild(o);
+  });
+  const cat=sessionStorage.getItem('pb_cat'),otp=sessionStorage.getItem('pb_otp'),court=sessionStorage.getItem('pb_court');
+  if(cat&&otp){ S.category=cat; S.otp=otp; S.label=(CATS.find(c=>c.key===cat)||{}).label; sel.value=cat; document.getElementById('otpIn').value=otp; authenticate(court||null); }
+  checkPendingIndicator();
 })();
 
 /* ---- screens ---- */
-function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
 
 /* ---- auth ---- */
 async function authenticate(restoreCourt){
   const cat=document.getElementById('catSel').value;
   const otp=document.getElementById('otpIn').value.trim();
   const err=document.getElementById('loginErr'); err.classList.remove('show');
-  if(!/^\d{4}$/.test(otp)){ err.textContent='Enter the 4-digit access code.'; err.classList.add('show'); return; }
+  if(!/^\d{4}$/.test(otp)){err.textContent='Enter the 4-digit access code.';err.classList.add('show');return;}
   try{
     const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({action:'scoreAuth',category:cat,otp:otp})});
     const out=await res.json();
-    if(!out.ok){ err.textContent=out.error||'Could not access this category.'; err.classList.add('show'); return; }
+    if(!out.ok){err.textContent=out.error||'Could not access this category.';err.classList.add('show');return;}
     S.category=cat; S.otp=otp; S.label=out.label; S.bracket=out;
     sessionStorage.setItem('pb_cat',cat); sessionStorage.setItem('pb_otp',otp);
     document.getElementById('courtCtx').innerHTML=`${out.label}<br><span style="font-weight:700;color:var(--muted);font-size:.85rem">Week ${out.week} · choose your court</span>`;
-    if(restoreCourt){ S.court=restoreCourt; enterScoring(); }
-    else show('scrCourt');
-  }catch(e){ err.textContent="You don't have access, please contact the admin of PB71!"; err.classList.add('show'); }
+    if(restoreCourt){S.court=restoreCourt;enterScoring();}else show('scrCourt');
+  }catch(e){err.textContent='Network error. Check your connection.';err.classList.add('show');}
 }
-
 function pickCourt(c){ S.court=c; sessionStorage.setItem('pb_court',c); enterScoring(); }
 function backToCourt(){ stopPoll(); show('scrCourt'); }
-function logout(){ stopPoll(); sessionStorage.clear(); S={category:null,label:null,otp:null,court:null,bracket:null};
-  document.getElementById('otpIn').value=''; show('scrLogin'); }
-
+function logout(){ stopPoll(); sessionStorage.clear(); S={category:null,label:null,otp:null,court:null,bracket:null}; document.getElementById('otpIn').value=''; show('scrLogin'); }
 function enterScoring(){ show('scrScore'); renderScore(); startPoll(); }
 
-/* ---- refresh / poll ---- */
+/* ---- refresh + poll ---- */
 async function refresh(manual){
   if(saving) return;
-  if(!manual && document.activeElement && document.activeElement.classList.contains('scorein')) return; // don't clobber typing
+  // PERF: don't refresh if referee typed into a score field in the last 10 seconds
+  if(!manual && Date.now()-lastInteractionTime < 10000) return;
   try{
     const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({action:'getBracket',category:S.category,otp:S.otp})});
     const out=await res.json();
     if(out.ok){ S.bracket=out; renderScore(); if(manual) toast('Updated'); }
     else if(manual) toast(out.error||'Could not refresh');
   }catch(e){ if(manual) toast('Network error'); }
+
+  // Retry any pending score on every refresh
+  if(!saving) await retryPendingScore();
 }
 function startPoll(){ stopPoll(); pollTimer=setInterval(()=>refresh(false),15000); }
-function stopPoll(){ if(pollTimer){ clearInterval(pollTimer); pollTimer=null; } }
+function stopPoll(){ if(pollTimer){clearInterval(pollTimer);pollTimer=null;} }
 
-/* ---- labels ---- */
+/* ---- stage labels — all 5 bracket types ---- */
 function stageLabel(m){
   if(m.stage==='group'){ const x=m.id.match(/^G(\d+)M(\d+)$/); return x?('Group '+x[1]+' · Match '+x[2]):m.id; }
-  if(m.id==='F') return 'Final';
-  if(m.id==='3P') return '3rd Place';
-  if(m.stage==='qf') return 'Quarterfinal '+m.id.slice(2);
-  if(m.stage==='sf') return 'Semifinal '+m.id.slice(2);
+  const map={F:'Final',F1:'Final 1',F2:'Final 2','3P':'3rd Place',CON:'Consolation'};
+  if(map[m.id]) return map[m.id];
+  if(m.stage==='qf')        return 'Quarterfinal '+m.id.slice(2);
+  if(m.stage==='sf')        return 'Semifinal '+m.id.slice(2);
+  if(m.stage==='consolation')return 'Consolation';
+  if(m.stage==='final1')    return 'Final 1';
+  if(m.stage==='final2')    return 'Final 2';
   return m.id;
+}
+
+/* ---- extra CSS class for special match types ---- */
+function matchCardClass(m){
+  if(m.id==='F')  return 'match final-card';
+  if(m.id==='F1') return 'match final1-card';
+  if(m.id==='F2') return 'match final2-card';
+  return 'match';
 }
 
 /* ---- render scoring screen ---- */
 function renderScore(){
-  const b=S.bracket; if(!b){ return; }
-  document.getElementById('scoreCtx').innerHTML=`${b.label}<br><span style="font-weight:700;font-size:.85rem">Week ${b.week} · <span class="court">${S.court}</span></span>`;
+  const b=S.bracket; if(!b) return;
+  document.getElementById('scoreCtx').innerHTML=
+    `${b.label}<br><span style="font-weight:700;font-size:.85rem">Week ${b.week} · <span class="court">${S.court}</span></span>`;
   const body=document.getElementById('scoreBody'); body.innerHTML='';
 
   // YOUR COURT matches
   const mine=b.matches.filter(m=>m.court===S.court);
   const h1=document.createElement('div'); h1.className='sec-h'; h1.textContent='Your matches — '+S.court; body.appendChild(h1);
   if(mine.length===0) body.appendChild(el('<div class="match"><div class="waiting">No matches on this court.</div></div>'));
-  mine.forEach(m=> body.appendChild(matchCard(m,true)) );
+  mine.forEach(m=>body.appendChild(matchCard(m,true)));
 
   // GROUP STANDINGS
   const h2=document.createElement('div'); h2.className='sec-h'; h2.textContent='Group standings'; body.appendChild(h2);
   b.groups.forEach(g=>{
-    const rows=g.rows.map(r=>`<tr><td class="c">${r.rank}</td><td>${r.name}${r.tie?' <span class="tie">tie</span>':''}</td><td class="c">${r.wins}</td><td class="c">${r.net>0?'+':''}${r.net}</td></tr>`).join('');
+    const rows=g.rows.map(r=>`<tr>
+      <td class="c">${r.rank}</td>
+      <td>${r.name}${r.tie?'<span class="tie-flag">tie</span>':''}</td>
+      <td class="c">${r.wins}</td>
+      <td class="c">${r.net>0?'+':''}${r.net}</td>
+      <td class="c">${r.pf}</td>
+      <td class="c">${r.pa}</td></tr>`).join('');
     body.appendChild(el(`<div class="gcard"><h4>${g.label} ${g.complete?'':'<span style="color:var(--muted);font-weight:700;font-size:.8rem">(in progress)</span>'}</h4>
-      <table class="stand"><tr><th>#</th><th>Team</th><th>W</th><th>Net</th></tr>${rows}</table></div>`));
+      <table class="stand"><tr><th>#</th><th>Team</th><th>W</th><th>Net</th><th>PF</th><th>PA</th></tr>${rows}</table></div>`));
   });
 
-  // FULL DRAW overview (read-only, collapsible)
-  const h3=document.createElement('div'); h3.className='sec-h collapse'; h3.innerHTML='Full draw overview +';
-  h3.onclick=()=>{ const o=document.getElementById('overBox'); o.classList.toggle('show'); h3.innerHTML='Full draw overview '+(o.classList.contains('show')?'−':'+'); };
+  // FULL DRAW overview (collapsible)
+  const h3=document.createElement('div'); h3.className='sec-h collapse';
+  h3.innerHTML='Full draw overview +';
+  h3.onclick=()=>{ const o=document.getElementById('overBox'); o.classList.toggle('show'); h3.innerHTML='Full draw overview '+(o.classList.contains('show')?'-':'+'); };
   body.appendChild(h3);
   const over=document.createElement('div'); over.className='over'; over.id='overBox';
-  b.matches.forEach(m=> over.appendChild(matchCard(m,false)) );
+
+  // For 2-finals: group the finals separately in a side-by-side grid
+  if(b.numFinals===2){
+    const groupMoves=b.matches.filter(m=>m.stage==='group');
+    const otherKO=b.matches.filter(m=>m.stage!=='group'&&m.stage!=='final1'&&m.stage!=='final2');
+    const finals=b.matches.filter(m=>m.stage==='final1'||m.stage==='final2');
+    groupMoves.forEach(m=>over.appendChild(matchCard(m,false)));
+    otherKO.forEach(m=>over.appendChild(matchCard(m,false)));
+    if(finals.length){
+      const fg=document.createElement('div');fg.className='finals-grid';
+      finals.forEach(m=>fg.appendChild(matchCard(m,false)));
+      over.appendChild(fg);
+    }
+  }else{
+    b.matches.forEach(m=>over.appendChild(matchCard(m,false)));
+  }
   body.appendChild(over);
 }
 
-function matchCard(m, editableContext){
-  const card=document.createElement('div'); card.className='match';
+/* ---- build a match card ---- */
+function matchCard(m,editableCtx){
+  const card=document.createElement('div');
+  card.className=matchCardClass(m);
   let head=`<div class="mh"><span>${stageLabel(m)}</span><span>${m.court} · ${m.time}</span></div>`;
   let inner='';
-  const ready = m.aReady && m.bReady;
+  const ready=m.aReady&&m.bReady;
 
   if(!ready){
-    inner=`<div class="teams"><div class="teamrow"><span class="nm">${m.aName}</span></div>
+    inner=`<div class="teams">
+      <div class="teamrow"><span class="nm">${m.aName}</span></div>
       <div class="teamrow"><span class="nm">${m.bName}</span></div></div>
-      <div style="margin-top:8px"><span class="badge wait">waiting</span> <span class="waiting">teams not decided yet</span></div>`;
-  } else {
-    const canEdit = editableContext && m.court===S.court && m.editable;
+      <div style="margin-top:8px"><span class="badge wait">waiting — teams not yet decided</span></div>`;
+  }else{
+    const canEdit=editableCtx&&m.court===S.court&&m.editable;
     if(canEdit){
       inner=`<div class="teams">
-        <div class="teamrow"><span class="nm">${m.aName}</span><input class="scorein" id="sa_${m.id}" inputmode="numeric" value="${m.scoreA==null?'':m.scoreA}"></div>
-        <div class="teamrow"><span class="nm">${m.bName}</span><input class="scorein" id="sb_${m.id}" inputmode="numeric" value="${m.scoreB==null?'':m.scoreB}"></div>
-        </div>
+        <div class="teamrow"><span class="nm">${m.aName}</span>
+          <input class="scorein" id="sa_${m.id}" inputmode="numeric" value="${m.scoreA==null?'':m.scoreA}"
+            oninput="trackInteraction()" onfocus="trackInteraction()"></div>
+        <div class="teamrow"><span class="nm">${m.bName}</span>
+          <input class="scorein" id="sb_${m.id}" inputmode="numeric" value="${m.scoreB==null?'':m.scoreB}"
+            oninput="trackInteraction()" onfocus="trackInteraction()"></div></div>
         <button class="savebtn" onclick="saveScore('${m.id}')">${m.done?'Update score':'Save score'}</button>`;
-    } else {
-      const score = m.done? `<span class="finalscore">${m.scoreA} – ${m.scoreB}</span>` : '<span class="waiting">not played yet</span>';
-      const badge = m.done? `<span class="badge win">${m.winner} won</span>` : (m.editable? '' : '<span class="badge locked">locked</span>');
+    }else{
+      const score=m.done?`<span class="finalscore">${m.scoreA} – ${m.scoreB}</span>`:'<span class="waiting">not played yet</span>';
+      const badge=m.done?`<span class="badge win">${m.winner} won</span>`:
+        m.editable?'':`<span class="badge locked">locked</span>`;
       inner=`<div class="teams">
         <div class="teamrow"><span class="nm ${m.done&&m.winner===m.aName?'winner':''}">${m.aName}</span></div>
         <div class="teamrow"><span class="nm ${m.done&&m.winner===m.bName?'winner':''}">${m.bName}</span></div></div>
         <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">${score} ${badge}</div>`;
     }
   }
-  card.innerHTML=head+inner; return card;
+  card.innerHTML=head+inner;
+  return card;
 }
 
-/* ---- save ---- */
+/* ---- save a match score ---- */
 async function saveScore(matchId){
   const sa=document.getElementById('sa_'+matchId).value.trim();
   const sb=document.getElementById('sb_'+matchId).value.trim();
   if(sa===''||sb===''){ toast('Enter both scores.'); return; }
   saving=true;
   try{
-    const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({action:'saveScore',
-      category:S.category,otp:S.otp,court:S.court,matchId:matchId,scoreA:sa,scoreB:sb})});
-    const out=await res.json();
-    if(out.ok){ S.bracket=out; toast('Saved'); renderScore(); }
-    else toast(out.error||'Could not save');
-  }catch(e){ toast('Network error'); }
-  finally{ saving=false; }
+    const result=await _callSaveScore(matchId,sa,sb,S.category,S.court,S.otp);
+    if(result&&result.ok){
+      clearPendingScore();
+      S.bracket=result;
+      toast('Saved');
+      renderScore();
+    }else{
+      // PERF: store unsaved score in sessionStorage for retry on reconnection
+      savePendingScore(matchId,sa,sb,S.category,S.court,S.otp);
+      toast(result&&result.error?result.error:'Could not save — score stored for retry');
+    }
+  }catch(e){
+    savePendingScore(matchId,sa,sb,S.category,S.court,S.otp);
+    toast('Network error — score stored for retry');
+  }finally{ saving=false; }
+}
+
+async function _callSaveScore(matchId,scoreA,scoreB,category,court,otp){
+  const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({action:'saveScore',
+    category:category,otp:otp,court:court,matchId:matchId,scoreA:scoreA,scoreB:scoreB})});
+  return await res.json();
+}
+
+/* ======================== PENDING SCORE (sessionStorage retry) ======================== */
+function savePendingScore(matchId,scoreA,scoreB,category,court,otp){
+  sessionStorage.setItem('pb_pending',JSON.stringify({matchId,scoreA,scoreB,category,court,otp,ts:Date.now()}));
+  checkPendingIndicator();
+}
+function clearPendingScore(){
+  sessionStorage.removeItem('pb_pending');
+  checkPendingIndicator();
+}
+function checkPendingIndicator(){
+  const pill=document.getElementById('pendingPill'); if(!pill) return;
+  const raw=sessionStorage.getItem('pb_pending');
+  if(raw){
+    const p=JSON.parse(raw);
+    const age=Math.round((Date.now()-p.ts)/1000);
+    pill.style.display='inline-block';
+    pill.className='pending-pill';
+    pill.textContent='Score pending ('+age+'s) — tap to retry';
+  }else{
+    pill.style.display='none';
+  }
+}
+async function retryPendingScore(){
+  const raw=sessionStorage.getItem('pb_pending'); if(!raw) return;
+  const p=JSON.parse(raw);
+  // Discard if older than 2 hours (session likely stale)
+  if(Date.now()-p.ts > 2*60*60*1000){ clearPendingScore(); return; }
+  const pill=document.getElementById('pendingPill');
+  if(pill){pill.className='pending-pill retry';pill.textContent='Retrying…';}
+  try{
+    const result=await _callSaveScore(p.matchId,p.scoreA,p.scoreB,p.category,p.court,p.otp);
+    if(result&&result.ok){
+      clearPendingScore();
+      S.bracket=result;
+      toast('Pending score saved');
+      renderScore();
+    }else{
+      checkPendingIndicator();
+      if(pill) toast(result&&result.error?result.error:'Retry failed — will try again');
+    }
+  }catch(e){ checkPendingIndicator(); }
 }
 
 /* ---- helpers ---- */
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
 let toastT;
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2000); }
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2200); }
 </script>
 </body>
 </html>
