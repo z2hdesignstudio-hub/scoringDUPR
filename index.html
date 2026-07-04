@@ -286,11 +286,11 @@ function renderScore(){
         <td>${r.name}${r.tie?'<span class="tie-flag">tie</span>':''}${qBadge}</td>
         <td class="c">${r.wins}</td>
         <td class="c">${r.net>0?'+':''}${r.net}</td>
-        <td class="c">${r.pf}</td>
+        <td class="c">${r.}</td>
         <td class="c">${r.pa}</td></tr>`;
     }).join('');
     body.appendChild(el(`<div class="gcard"><h4>${g.label} ${g.complete?'':'<span style="color:var(--muted);font-weight:700;font-size:.8rem">(in progress)</span>'}</h4>
-      <table class="stand"><tr><th>#</th><th>Team</th><th>W</th><th>Net</th><th>PF</th><th>PA</th></tr>${rows}</table></div>`));
+      <table class="stand"><tr><th>#</th><th>Team</th><th>W</th><th>Net</th><th>PT</th><th>PG</th></tr>${rows}</table></div>`));
   });
 
   // FULL DRAW overview (collapsible)
