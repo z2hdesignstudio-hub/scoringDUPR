@@ -94,6 +94,11 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
 .stand td{padding:7px 9px;border-bottom:1px solid #e1e8df;font-weight:700;}
 .stand td.c{text-align:center;}
 .stand .tie-flag{color:var(--pink);font-size:.72rem;font-weight:800;margin-left:4px;}
+/* Gold highlight for advancing teams */
+.stand tr.adv td{background:linear-gradient(135deg,#fff8dc,#fef0a0);}
+.stand tr.adv td:first-child{color:#8b6914;}
+.qbadge{display:inline-block;margin-left:7px;font-size:.68rem;font-weight:800;
+  padding:2px 7px;border-radius:9px;background:#d4a017;color:#fff;vertical-align:middle;}
 .gcard{background:var(--surface);border-radius:var(--r-sm);box-shadow:var(--clay-sm);padding:13px 14px;margin-bottom:12px;}
 .gcard h4{font-family:'Fredoka',sans-serif;font-weight:600;margin-bottom:8px;}
 .collapse{cursor:pointer;user-select:none;}
@@ -160,7 +165,7 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
 /* ============================================================
    PASTE YOUR APPS SCRIPT /exec URL HERE
    ============================================================ */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzeZaUXvfqsA1oVqwwnSxdn_JJrYnCJQ5-3vA0-TCJSjMZUP2tRMEl-PawqlxZ5opGbXg/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzeZaUXvfqsA1oVqwwnSxdn_JJrYnCJQ5-3vA0-TCJSjMZUP2tRMEl-PawqlxZ5opGbXg/exec"; 
 
 // All 6 categories — Season 2
 const CATS = [
@@ -272,13 +277,18 @@ function renderScore(){
   // GROUP STANDINGS
   const h2=document.createElement('div'); h2.className='sec-h'; h2.textContent='Group standings'; body.appendChild(h2);
   b.groups.forEach(g=>{
-    const rows=g.rows.map(r=>`<tr>
-      <td class="c">${r.rank}</td>
-      <td>${r.name}${r.tie?'<span class="tie-flag">tie</span>':''}</td>
-      <td class="c">${r.wins}</td>
-      <td class="c">${r.net>0?'+':''}${r.net}</td>
-      <td class="c">${r.pf}</td>
-      <td class="c">${r.pa}</td></tr>`).join('');
+    const rows=g.rows.map(r=>{
+      const adv=r.advancement;
+      const isGold=adv==='advances'||adv==='q7'||adv==='q8';
+      const qBadge=adv==='q7'?'<span class="qbadge">Q7</span>':adv==='q8'?'<span class="qbadge">Q8</span>':'';
+      return `<tr class="${isGold?'adv':''}">
+        <td class="c">${r.rank}</td>
+        <td>${r.name}${r.tie?'<span class="tie-flag">tie</span>':''}${qBadge}</td>
+        <td class="c">${r.wins}</td>
+        <td class="c">${r.net>0?'+':''}${r.net}</td>
+        <td class="c">${r.pf}</td>
+        <td class="c">${r.pa}</td></tr>`;
+    }).join('');
     body.appendChild(el(`<div class="gcard"><h4>${g.label} ${g.complete?'':'<span style="color:var(--muted);font-weight:700;font-size:.8rem">(in progress)</span>'}</h4>
       <table class="stand"><tr><th>#</th><th>Team</th><th>W</th><th>Net</th><th>PF</th><th>PA</th></tr>${rows}</table></div>`));
   });
