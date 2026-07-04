@@ -165,7 +165,7 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
 /* ============================================================
    PASTE YOUR APPS SCRIPT /exec URL HERE
    ============================================================ */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzeZaUXvfqsA1oVqwwnSxdn_JJrYnCJQ5-3vA0-TCJSjMZUP2tRMEl-PawqlxZ5opGbXg/exec"; 
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzeZaUXvfqsA1oVqwwnSxdn_JJrYnCJQ5-3vA0-TCJSjMZUP2tRMEl-PawqlxZ5opGbXg/exec";
 
 // All 6 categories — Season 2
 const CATS = [
@@ -286,7 +286,7 @@ function renderScore(){
         <td>${r.name}${r.tie?'<span class="tie-flag">tie</span>':''}${qBadge}</td>
         <td class="c">${r.wins}</td>
         <td class="c">${r.net>0?'+':''}${r.net}</td>
-        <td class="c">${r.}</td>
+        <td class="c">${r.pf}</td>
         <td class="c">${r.pa}</td></tr>`;
     }).join('');
     body.appendChild(el(`<div class="gcard"><h4>${g.label} ${g.complete?'':'<span style="color:var(--muted);font-weight:700;font-size:.8rem">(in progress)</span>'}</h4>
