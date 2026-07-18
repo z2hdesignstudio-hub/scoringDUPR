@@ -110,6 +110,8 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
   pointer-events:none;transition:opacity .3s;z-index:60;text-align:center;max-width:90vw;}
 .toast.show{opacity:1;}
 .loading{text-align:center;color:var(--muted);font-weight:700;padding:30px;}
+.week-selector-w3{display:flex;align-items:center;gap:8px;margin-bottom:18px;}
+.week-selector-w3 select{flex:1;margin-bottom:0;}
 </style>
 </head>
 <body>
@@ -126,9 +128,17 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
       <p class="err" id="loginErr"></p>
       <label class="fld">Category</label>
       <select id="catSel"></select>
-      <label class="fld">Access code (OTP)</label>
-      <input class="otp" id="otpIn" inputmode="numeric" maxlength="4" placeholder="0000">
-      <button class="btn" onclick="authenticate()">Continue</button>
+      <label class="fld">Week</label>
+      <div class="week-selector-w3">
+        <button class="mini" onclick="prevWeekW3()">‹</button>
+        <select id="weekSelW3" onchange="onWeekSelChange()"></select>
+        <button class="mini" onclick="nextWeekW3()">›</button>
+      </div>
+      <div id="otpFieldWrap">
+        <label class="fld">Access code (OTP)</label>
+        <input class="otp" id="otpIn" inputmode="numeric" maxlength="4" placeholder="0000">
+      </div>
+      <button class="btn" id="loginBtn" onclick="authenticate()">Continue</button>
     </div>
   </section>
 
@@ -151,7 +161,7 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
       <div class="acts">
         <span class="pending-pill" id="pendingPill" style="display:none" onclick="retryPendingScore()">Score pending — tap to retry</span>
         <button class="mini" onclick="refresh(true)">Refresh</button>
-        <button class="mini" onclick="backToCourt()">Court</button>
+        <button class="mini" id="courtBtn" onclick="backToCourt()">Court</button>
         <button class="mini" onclick="logout()">Exit</button>
       </div>
     </div>
@@ -178,9 +188,49 @@ const CATS = [
   {key:'stinger_singles', label:'STINGER BEE · Singles'},
 ];
 
-let S = { category:null, label:null, otp:null, court:null, bracket:null };
+let S = { category:null, label:null, otp:null, court:null, bracket:null, readOnly:false, week:null };
 let saving = false;
 let pollTimer = null;
+
+// Same Saturday-anchored week formula used elsewhere (Website 1's lbWeek(),
+// Code.gs's getCurrentWeekNumber()) — computed client-side so the week
+// selector works without an extra round-trip just to learn "what week is it".
+const WEEK14_START_W3 = new Date(2026, 5, 13); // Sat 13 Jun 2026
+function computeCurrentWeek(){
+  return 14+Math.floor((Date.now()-WEEK14_START_W3.getTime())/(7*24*60*60*1000));
+}
+const WEEK_HISTORY_START_W3 = 16; // history browsing goes back this far, no further
+let SELECTED_WEEK_W3 = null;
+
+function populateWeekSelW3(){
+  const dd=document.getElementById('weekSelW3');
+  const cw=computeCurrentWeek();
+  if(SELECTED_WEEK_W3===null) SELECTED_WEEK_W3=cw;
+  dd.innerHTML='';
+  for(let w=WEEK_HISTORY_START_W3; w<=cw; w++){
+    const opt=document.createElement('option');
+    opt.value=w; opt.textContent='Week '+w+(w===cw?' (current)':'');
+    if(w===SELECTED_WEEK_W3) opt.selected=true;
+    dd.appendChild(opt);
+  }
+  updateLoginModeUI();
+}
+function onWeekSelChange(){
+  SELECTED_WEEK_W3=Number(document.getElementById('weekSelW3').value);
+  updateLoginModeUI();
+}
+function prevWeekW3(){ if(SELECTED_WEEK_W3>WEEK_HISTORY_START_W3){ SELECTED_WEEK_W3--; populateWeekSelW3(); } }
+function nextWeekW3(){ const cw=computeCurrentWeek(); if(SELECTED_WEEK_W3<cw){ SELECTED_WEEK_W3++; populateWeekSelW3(); } }
+
+// Toggles the OTP field and button label based on whether the selected
+// week is the current (live, OTP-gated) week or a past one (read-only,
+// no code needed at all).
+function updateLoginModeUI(){
+  const cw=computeCurrentWeek();
+  const isPast=SELECTED_WEEK_W3!==cw;
+  document.getElementById('otpFieldWrap').style.display=isPast?'none':'block';
+  document.getElementById('loginBtn').textContent=isPast?'View Results':'Continue';
+}
 
 // PERF: track last score-field interaction to block auto-refresh mid-typing
 let lastInteractionTime = 0;
@@ -196,6 +246,7 @@ function trackInteraction(){ lastInteractionTime = Date.now(); }
   });
   const cat=sessionStorage.getItem('pb_cat'),otp=sessionStorage.getItem('pb_otp'),court=sessionStorage.getItem('pb_court');
   if(cat&&otp){ S.category=cat; S.otp=otp; S.label=(CATS.find(c=>c.key===cat)||{}).label; sel.value=cat; document.getElementById('otpIn').value=otp; authenticate(court||null); }
+  populateWeekSelW3();
   checkPendingIndicator();
 })();
 
@@ -205,14 +256,34 @@ function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.r
 /* ---- auth ---- */
 async function authenticate(restoreCourt){
   const cat=document.getElementById('catSel').value;
-  const otp=document.getElementById('otpIn').value.trim();
+  const cw=computeCurrentWeek();
+  const isPast=SELECTED_WEEK_W3!==cw;
   const err=document.getElementById('loginErr'); err.classList.remove('show');
+
+  if(isPast){
+    // History browsing — no OTP needed at all. The server independently
+    // blocks this same action for the current week (defense in depth),
+    // so the OTP security boundary for live events is never bypassable
+    // through this path.
+    try{
+      const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({
+        action:'viewBracketPublic',week:SELECTED_WEEK_W3,category:cat,
+      })});
+      const out=await res.json();
+      if(!out.ok){ err.textContent=out.error||'Could not load results.'; err.classList.add('show'); return; }
+      S.category=cat; S.label=out.label; S.bracket=out; S.court=null; S.readOnly=true; S.week=SELECTED_WEEK_W3;
+      enterHistoryView();
+    }catch(e){ err.textContent='Network error. Check your connection.'; err.classList.add('show'); }
+    return;
+  }
+
+  const otp=document.getElementById('otpIn').value.trim();
   if(!/^\d{4}$/.test(otp)){err.textContent='Enter the 4-digit access code.';err.classList.add('show');return;}
   try{
     const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({action:'scoreAuth',category:cat,otp:otp})});
     const out=await res.json();
     if(!out.ok){err.textContent=out.error||'Could not access this category.';err.classList.add('show');return;}
-    S.category=cat; S.otp=otp; S.label=out.label; S.bracket=out;
+    S.category=cat; S.otp=otp; S.label=out.label; S.bracket=out; S.readOnly=false;
     sessionStorage.setItem('pb_cat',cat); sessionStorage.setItem('pb_otp',otp);
     document.getElementById('courtCtx').innerHTML=`${out.label}<br><span style="font-weight:700;color:var(--muted);font-size:.85rem">Week ${out.week} · choose your court</span>`;
     if(restoreCourt){S.court=restoreCourt;enterScoring();}else show('scrCourt');
@@ -220,8 +291,19 @@ async function authenticate(restoreCourt){
 }
 function pickCourt(c){ S.court=c; sessionStorage.setItem('pb_court',c); enterScoring(); }
 function backToCourt(){ stopPoll(); show('scrCourt'); }
-function logout(){ stopPoll(); sessionStorage.clear(); S={category:null,label:null,otp:null,court:null,bracket:null}; document.getElementById('otpIn').value=''; show('scrLogin'); }
-function enterScoring(){ show('scrScore'); renderScore(); startPoll(); }
+function logout(){ stopPoll(); sessionStorage.clear(); S={category:null,label:null,otp:null,court:null,bracket:null,readOnly:false,week:null}; document.getElementById('otpIn').value=''; show('scrLogin'); }
+function enterScoring(){ show('scrScore'); showLiveModeControls(); renderScore(); startPoll(); }
+function enterHistoryView(){ show('scrScore'); showReadOnlyModeControls(); renderScore(); }
+
+// Toggles topbar controls that only make sense in one mode or the other.
+function showLiveModeControls(){
+  document.getElementById('courtBtn').style.display='';
+  const pill=document.getElementById('pendingPill'); if(pill) checkPendingIndicator();
+}
+function showReadOnlyModeControls(){
+  document.getElementById('courtBtn').style.display='none';
+  const pill=document.getElementById('pendingPill'); if(pill) pill.style.display='none';
+}
 
 /* ---- refresh + poll ---- */
 async function refresh(manual){
@@ -229,14 +311,18 @@ async function refresh(manual){
   // PERF: don't refresh if referee typed into a score field in the last 10 seconds
   if(!manual && Date.now()-lastInteractionTime < 10000) return;
   try{
-    const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({action:'getBracket',category:S.category,otp:S.otp})});
+    const body = S.readOnly
+      ? {action:'viewBracketPublic',week:S.week,category:S.category}
+      : {action:'getBracket',category:S.category,otp:S.otp};
+    const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(body)});
     const out=await res.json();
     if(out.ok){ S.bracket=out; renderScore(); if(manual) toast('Updated'); }
     else if(manual) toast(out.error||'Could not refresh');
   }catch(e){ if(manual) toast('Network error'); }
 
-  // Retry any pending score on every refresh
-  if(!saving) await retryPendingScore();
+  // Retry any pending score on every refresh (live scoring mode only —
+  // there's never anything pending in read-only mode)
+  if(!S.readOnly && !saving) await retryPendingScore();
 }
 function startPoll(){ stopPoll(); pollTimer=setInterval(()=>refresh(false),15000); }
 function stopPoll(){ if(pollTimer){clearInterval(pollTimer);pollTimer=null;} }
@@ -265,17 +351,21 @@ function matchCardClass(m){
 /* ---- render scoring screen ---- */
 function renderScore(){
   const b=S.bracket; if(!b) return;
-  document.getElementById('scoreCtx').innerHTML=
-    `${b.label}<br><span style="font-weight:700;font-size:.85rem">Week ${b.week} · <span class="court">${S.court}</span></span>`;
+  document.getElementById('scoreCtx').innerHTML = S.readOnly
+    ? `${b.label}<br><span style="font-weight:700;font-size:.85rem">Week ${S.week} · <span class="court">Read-only results</span></span>`
+    : `${b.label}<br><span style="font-weight:700;font-size:.85rem">Week ${b.week} · <span class="court">${S.court}</span></span>`;
   const body=document.getElementById('scoreBody'); body.innerHTML='';
 
-  // YOUR COURT matches
-  const mine=b.matches.filter(m=>m.court===S.court);
-  const h1=document.createElement('div'); h1.className='sec-h'; h1.textContent='Your matches — '+S.court; body.appendChild(h1);
-  if(mine.length===0) body.appendChild(el('<div class="match"><div class="waiting">No matches on this court.</div></div>'));
-  mine.forEach(m=>body.appendChild(matchCard(m,true)));
+  if(!S.readOnly){
+    // YOUR COURT matches (live scoring mode only — no "your court" concept
+    // exists when just browsing historical results)
+    const mine=b.matches.filter(m=>m.court===S.court);
+    const h1=document.createElement('div'); h1.className='sec-h'; h1.textContent='Your matches — '+S.court; body.appendChild(h1);
+    if(mine.length===0) body.appendChild(el('<div class="match"><div class="waiting">No matches on this court.</div></div>'));
+    mine.forEach(m=>body.appendChild(matchCard(m,true)));
+  }
 
-  // GROUP STANDINGS
+  // GROUP STANDINGS (shown in both modes)
   const h2=document.createElement('div'); h2.className='sec-h'; h2.textContent='Group standings'; body.appendChild(h2);
   b.groups.forEach(g=>{
     const rows=g.rows.map(r=>{
@@ -294,7 +384,29 @@ function renderScore(){
       <table class="stand"><tr><th>#</th><th>Team</th><th>W</th><th>Net</th><th>PT</th><th>PG</th></tr>${rows}</table></div>`));
   });
 
-  // FULL DRAW overview (collapsible)
+  if(S.readOnly){
+    // Read-only mode: show every match directly — no collapsible wrapper,
+    // since browsing everything IS the point here. Reuses the exact same
+    // non-editable rendering already used for "other court" matches.
+    const h3=document.createElement('div'); h3.className='sec-h'; h3.textContent='All Matches'; body.appendChild(h3);
+    if(b.numFinals===2){
+      const groupMoves=b.matches.filter(m=>m.stage==='group');
+      const otherKO=b.matches.filter(m=>m.stage!=='group'&&m.stage!=='final1'&&m.stage!=='final2');
+      const finals=b.matches.filter(m=>m.stage==='final1'||m.stage==='final2');
+      groupMoves.forEach(m=>body.appendChild(matchCard(m,false)));
+      otherKO.forEach(m=>body.appendChild(matchCard(m,false)));
+      if(finals.length){
+        const fg=document.createElement('div');fg.className='finals-grid';
+        finals.forEach(m=>fg.appendChild(matchCard(m,false)));
+        body.appendChild(fg);
+      }
+    }else{
+      b.matches.forEach(m=>body.appendChild(matchCard(m,false)));
+    }
+    return;
+  }
+
+  // FULL DRAW overview (collapsible) — live scoring mode only
   const h3=document.createElement('div'); h3.className='sec-h collapse';
   h3.innerHTML='Full draw overview +';
   h3.onclick=()=>{ const o=document.getElementById('overBox'); o.classList.toggle('show'); h3.innerHTML='Full draw overview '+(o.classList.contains('show')?'-':'+'); };
