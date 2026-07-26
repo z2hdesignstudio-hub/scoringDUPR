@@ -135,8 +135,9 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
         <button class="mini" onclick="nextWeekW3()">›</button>
       </div>
       <div id="otpFieldWrap">
-        <label class="fld">Access code (OTP)</label>
+        <label class="fld" id="otpFieldLabel">Access code (OTP)</label>
         <input class="otp" id="otpIn" inputmode="numeric" maxlength="4" placeholder="0000">
+        <input class="otp" id="pwIn" type="text" placeholder="Enter admin password" style="display:none;">
       </div>
       <button class="btn" id="loginBtn" onclick="authenticate()">Continue</button>
     </div>
@@ -188,7 +189,7 @@ const CATS = [
   {key:'stinger_singles', label:'STINGER BEE · Singles'},
 ];
 
-let S = { category:null, label:null, otp:null, court:null, bracket:null, readOnly:false, week:null };
+let S = { category:null, label:null, otp:null, court:null, bracket:null, readOnly:false, week:null, password:null };
 let saving = false;
 let pollTimer = null;
 
@@ -228,7 +229,11 @@ function nextWeekW3(){ const cw=computeCurrentWeek(); if(SELECTED_WEEK_W3<cw){ S
 function updateLoginModeUI(){
   const cw=computeCurrentWeek();
   const isPast=SELECTED_WEEK_W3!==cw;
-  document.getElementById('otpFieldWrap').style.display=isPast?'none':'block';
+  document.getElementById('otpFieldWrap').style.display='block'; // always visible now — just swaps which input shows
+  document.getElementById('otpFieldLabel').textContent=isPast?'Admin Password':'Access code (OTP)';
+  document.getElementById('otpIn').style.display=isPast?'none':'block';
+  document.getElementById('pwIn').style.display=isPast?'block':'none';
+  document.getElementById('pwIn').value=''; // clear any stale password whenever the week selection changes
   document.getElementById('loginBtn').textContent=isPast?'View Results':'Continue';
 }
 
@@ -261,17 +266,20 @@ async function authenticate(restoreCourt){
   const err=document.getElementById('loginErr'); err.classList.remove('show');
 
   if(isPast){
-    // History browsing — no OTP needed at all. The server independently
-    // blocks this same action for the current week (defense in depth),
-    // so the OTP security boundary for live events is never bypassable
-    // through this path.
+    // History browsing now requires the admin password (71@71@N, where N
+    // is the week being viewed) instead of being open to anyone. The
+    // server independently validates both the password AND blocks the
+    // current week (defense in depth), so this is never bypassable
+    // through direct API calls either.
+    const pw=document.getElementById('pwIn').value.trim();
+    if(!pw){ err.textContent='Enter the admin password to view this week.'; err.classList.add('show'); return; }
     try{
       const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify({
-        action:'viewBracketPublic',week:SELECTED_WEEK_W3,category:cat,
+        action:'viewBracketPublic',week:SELECTED_WEEK_W3,category:cat,password:pw,
       })});
       const out=await res.json();
       if(!out.ok){ err.textContent=out.error||'Could not load results.'; err.classList.add('show'); return; }
-      S.category=cat; S.label=out.label; S.bracket=out; S.court=null; S.readOnly=true; S.week=SELECTED_WEEK_W3;
+      S.category=cat; S.label=out.label; S.bracket=out; S.court=null; S.readOnly=true; S.week=SELECTED_WEEK_W3; S.password=pw;
       enterHistoryView();
     }catch(e){ err.textContent='Network error. Check your connection.'; err.classList.add('show'); }
     return;
@@ -291,7 +299,7 @@ async function authenticate(restoreCourt){
 }
 function pickCourt(c){ S.court=c; sessionStorage.setItem('pb_court',c); enterScoring(); }
 function backToCourt(){ stopPoll(); show('scrCourt'); }
-function logout(){ stopPoll(); sessionStorage.clear(); S={category:null,label:null,otp:null,court:null,bracket:null,readOnly:false,week:null}; document.getElementById('otpIn').value=''; show('scrLogin'); }
+function logout(){ stopPoll(); sessionStorage.clear(); S={category:null,label:null,otp:null,court:null,bracket:null,readOnly:false,week:null,password:null}; document.getElementById('otpIn').value=''; document.getElementById('pwIn').value=''; show('scrLogin'); }
 function enterScoring(){ show('scrScore'); showLiveModeControls(); renderScore(); startPoll(); }
 function enterHistoryView(){ show('scrScore'); showReadOnlyModeControls(); renderScore(); }
 
@@ -312,7 +320,7 @@ async function refresh(manual){
   if(!manual && Date.now()-lastInteractionTime < 10000) return;
   try{
     const body = S.readOnly
-      ? {action:'viewBracketPublic',week:S.week,category:S.category}
+      ? {action:'viewBracketPublic',week:S.week,category:S.category,password:S.password}
       : {action:'getBracket',category:S.category,otp:S.otp};
     const res=await fetch(BACKEND_URL,{method:'POST',body:JSON.stringify(body)});
     const out=await res.json();
