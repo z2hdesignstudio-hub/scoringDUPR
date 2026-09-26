@@ -118,7 +118,7 @@ input.otp{text-align:center;letter-spacing:.5em;font-size:1.6rem;font-family:'Fr
 <div class="wrap">
   <header>
     <img src="./picklebee-logo.png" class="logo" alt="PickleBee by 71" onerror="this.style.display='none'">
-    <div class="eyebrow">Referee Scoring — Season 2</div>
+    <div class="eyebrow" id="eyebrow">Referee Scoring</div>
     <h1 id="title">DUPR <span class="hl">Scoring</span></h1>
   </header>
 
@@ -200,6 +200,32 @@ const WEEK14_START_W3 = new Date(2026, 5, 13); // Sat 13 Jun 2026
 function computeCurrentWeek(){
   return 14+Math.floor((Date.now()-WEEK14_START_W3.getTime())/(7*24*60*60*1000));
 }
+
+/* ---- season labeling — mirrors Code.gs's SEASON_BOUNDARIES exactly.
+   Only used to LABEL weeks; keep this table in sync with the backend
+   whenever a new season is added. ---- */
+const SEASON_BOUNDARIES = [
+  {season:1, startWeek:1},
+  {season:2, startWeek:14},
+  {season:3, startWeek:29},
+];
+function getSeasonInfo(weekNum){
+  let cur=SEASON_BOUNDARIES[0];
+  for(const b of SEASON_BOUNDARIES){ if(weekNum>=b.startWeek) cur=b; else break; }
+  return {season:cur.season, seasonWeek:weekNum-cur.startWeek+1};
+}
+// Season 1/2 weeks intentionally keep showing as plain "Week N" — only
+// Season 3 onward gets the "Season N, Week M" treatment.
+function weekLabelFor(weekNum){
+  const s=getSeasonInfo(weekNum);
+  return s.season>=3 ? ('Season '+s.season+', Week '+s.seasonWeek) : ('Week '+weekNum);
+}
+function updateEyebrowW3(weekNum){
+  const s=getSeasonInfo(weekNum);
+  const el=document.getElementById('eyebrow');
+  if(el) el.textContent='Referee Scoring, Season '+s.season;
+}
+
 const WEEK_HISTORY_START_W3 = 16; // history browsing goes back this far, no further
 let SELECTED_WEEK_W3 = null;
 
@@ -207,10 +233,11 @@ function populateWeekSelW3(){
   const dd=document.getElementById('weekSelW3');
   const cw=computeCurrentWeek();
   if(SELECTED_WEEK_W3===null) SELECTED_WEEK_W3=cw;
+  updateEyebrowW3(cw);
   dd.innerHTML='';
   for(let w=WEEK_HISTORY_START_W3; w<=cw; w++){
     const opt=document.createElement('option');
-    opt.value=w; opt.textContent='Week '+w+(w===cw?' (current)':'');
+    opt.value=w; opt.textContent=weekLabelFor(w)+(w===cw?' (current)':'');
     if(w===SELECTED_WEEK_W3) opt.selected=true;
     dd.appendChild(opt);
   }
@@ -293,7 +320,7 @@ async function authenticate(restoreCourt){
     if(!out.ok){err.textContent=out.error||'Could not access this category.';err.classList.add('show');return;}
     S.category=cat; S.otp=otp; S.label=out.label; S.bracket=out; S.readOnly=false;
     sessionStorage.setItem('pb_cat',cat); sessionStorage.setItem('pb_otp',otp);
-    document.getElementById('courtCtx').innerHTML=`${out.label}<br><span style="font-weight:700;color:var(--muted);font-size:.85rem">Week ${out.week} · choose your court</span>`;
+    document.getElementById('courtCtx').innerHTML=`${out.label}<br><span style="font-weight:700;color:var(--muted);font-size:.85rem">${weekLabelFor(out.week)} · choose your court</span>`;
     if(restoreCourt){S.court=restoreCourt;enterScoring();}else show('scrCourt');
   }catch(e){err.textContent='Network error. Check your connection.';err.classList.add('show');}
 }
@@ -360,8 +387,8 @@ function matchCardClass(m){
 function renderScore(){
   const b=S.bracket; if(!b) return;
   document.getElementById('scoreCtx').innerHTML = S.readOnly
-    ? `${b.label}<br><span style="font-weight:700;font-size:.85rem">Week ${S.week} · <span class="court">Read-only results</span></span>`
-    : `${b.label}<br><span style="font-weight:700;font-size:.85rem">Week ${b.week} · <span class="court">${S.court}</span></span>`;
+    ? `${b.label}<br><span style="font-weight:700;font-size:.85rem">${weekLabelFor(S.week)} · <span class="court">Read-only results</span></span>`
+    : `${b.label}<br><span style="font-weight:700;font-size:.85rem">${weekLabelFor(b.week)} · <span class="court">${S.court}</span></span>`;
   const body=document.getElementById('scoreBody'); body.innerHTML='';
 
   if(!S.readOnly){
